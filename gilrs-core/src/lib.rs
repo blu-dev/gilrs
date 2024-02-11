@@ -7,7 +7,7 @@ use std::fmt::Formatter;
 
 use std::error;
 use std::time::Duration;
-use std::time::SystemTime;
+use std::time::Instant;
 
 mod platform;
 pub mod utils;
@@ -36,13 +36,13 @@ pub struct Event {
     /// Event's data.
     pub event: EventType,
     /// Time when event was emitted.
-    pub time: SystemTime,
+    pub time: Instant,
 }
 
 impl Event {
     /// Creates new event with current time.
     pub fn new(id: usize, event: EventType) -> Self {
-        let time = utils::time_now();
+        let time = Instant::now();
         Event { id, event, time }
     }
 }

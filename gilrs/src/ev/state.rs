@@ -11,7 +11,7 @@ use fnv::FnvHashMap;
 
 use std::collections::hash_map;
 use std::iter::Iterator;
-use std::time::SystemTime;
+use std::time::Instant;
 
 /// Cached gamepad state.
 #[derive(Clone, Debug)]
@@ -74,7 +74,7 @@ impl GamepadState {
         btn: Code,
         pressed: bool,
         counter: u64,
-        timestamp: SystemTime,
+        timestamp: Instant,
     ) {
         let data = self.buttons.entry(btn).or_insert_with(|| {
             ButtonData::new(
@@ -91,7 +91,7 @@ impl GamepadState {
         data.last_event_ts = timestamp;
     }
 
-    pub(crate) fn set_btn_repeating(&mut self, btn: Code, counter: u64, timestamp: SystemTime) {
+    pub(crate) fn set_btn_repeating(&mut self, btn: Code, counter: u64, timestamp: Instant) {
         let data = self
             .buttons
             .entry(btn)
@@ -106,7 +106,7 @@ impl GamepadState {
         btn: Code,
         value: f32,
         counter: u64,
-        timestamp: SystemTime,
+        timestamp: Instant,
     ) {
         let data = self
             .buttons
@@ -147,7 +147,7 @@ impl<'a> Iterator for AxisDataIter<'a> {
 /// Information about button stored in `State`.
 #[derive(Clone, Copy, Debug)]
 pub struct ButtonData {
-    last_event_ts: SystemTime,
+    last_event_ts: Instant,
     counter: u64,
     value: f32,
     is_pressed: bool,
@@ -160,7 +160,7 @@ impl ButtonData {
         pressed: bool,
         repeating: bool,
         counter: u64,
-        time: SystemTime,
+        time: Instant,
     ) -> Self {
         ButtonData {
             last_event_ts: time,
@@ -192,7 +192,7 @@ impl ButtonData {
     }
 
     /// Returns when button state last changed.
-    pub fn timestamp(&self) -> SystemTime {
+    pub fn timestamp(&self) -> Instant {
         self.last_event_ts
     }
 }
@@ -200,13 +200,13 @@ impl ButtonData {
 /// Information about axis stored in `State`.
 #[derive(Clone, Copy, Debug)]
 pub struct AxisData {
-    last_event_ts: SystemTime,
+    last_event_ts: Instant,
     last_event_c: u64,
     value: f32,
 }
 
 impl AxisData {
-    pub(crate) fn new(value: f32, counter: u64, time: SystemTime) -> Self {
+    pub(crate) fn new(value: f32, counter: u64, time: Instant) -> Self {
         AxisData {
             last_event_ts: time,
             last_event_c: counter,
@@ -224,7 +224,7 @@ impl AxisData {
     }
 
     /// Returns when axis value last changed.
-    pub fn timestamp(&self) -> SystemTime {
+    pub fn timestamp(&self) -> Instant {
         self.last_event_ts
     }
 }

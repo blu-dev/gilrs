@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-pub use gilrs_core::utils::*;
-
 /// Like `(a: f32 / b).ceil()` but for integers.
 pub fn ceil_div(a: u32, b: u32) -> u32 {
     if a == 0 {

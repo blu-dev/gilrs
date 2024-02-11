@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::mpsc::{self, Receiver, Sender, TryRecvError};
 use std::thread::JoinHandle;
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant};
 use std::{thread, u32};
 use uuid::Uuid;
 use windows::core::HSTRING;
@@ -57,12 +57,12 @@ const WGI_TO_GILRS_BUTTON_MAP: [(GamepadButtons, crate::EvCode); 14] = [
 struct WgiEvent {
     raw_game_controller: RawGameController,
     event: EventType,
-    pub time: SystemTime,
+    pub time: Instant,
 }
 
 impl WgiEvent {
     fn new(raw_game_controller: RawGameController, event: EventType) -> Self {
-        let time = utils::time_now();
+        let time = Instant::now();
         WgiEvent {
             raw_game_controller,
             event,

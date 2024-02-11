@@ -77,7 +77,7 @@ use crate::ev::{Axis, AxisOrBtn, Button, Code, Event, EventType};
 use crate::gamepad::{Gamepad, Gilrs};
 use crate::utils;
 
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 /// Discard axis events that changed less than `threshold`.
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -396,7 +396,7 @@ impl FilterFn for Repeat {
         match ev {
             Some(ev) => Some(ev),
             None => {
-                let now = utils::time_now();
+                let now = Instant::now();
                 for (id, gamepad) in gilrs.gamepads() {
                     for (nec, btn_data) in gamepad.state().buttons() {
                         match (
@@ -404,7 +404,7 @@ impl FilterFn for Repeat {
                             btn_data.is_repeating(),
                             now.duration_since(btn_data.timestamp()),
                         ) {
-                            (true, false, Ok(dur)) if dur >= self.after => {
+                            (true, false, dur) if dur >= self.after => {
                                 let btn_name = match gamepad.axis_or_btn_name(nec) {
                                     Some(AxisOrBtn::Btn(b)) => b,
                                     _ => Button::Unknown,
@@ -416,7 +416,7 @@ impl FilterFn for Repeat {
                                     time: btn_data.timestamp() + self.after,
                                 });
                             }
-                            (true, true, Ok(dur)) if dur >= self.every => {
+                            (true, true, dur) if dur >= self.every => {
                                 let btn_name = match gamepad.axis_or_btn_name(nec) {
                                     Some(AxisOrBtn::Btn(b)) => b,
                                     _ => Button::Unknown,

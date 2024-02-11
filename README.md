@@ -1,3 +1,6 @@
+# NOTICE
+This repo is a fork of the upstream gilrs repo [here](https://gitlab.com/gilrs-project/gilrs)
+
 GilRs - Game Input Library for Rust
 ===================================
 

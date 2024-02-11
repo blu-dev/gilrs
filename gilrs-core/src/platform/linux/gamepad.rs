@@ -38,7 +38,7 @@ use std::path::{Path, PathBuf};
 use std::str;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant};
 
 const HOTPLUG_DATA: u64 = u64::MAX;
 
@@ -789,7 +789,7 @@ impl Gamepad {
         (-1, -1)
     }
 
-    fn event(&mut self) -> Option<(EventType, SystemTime)> {
+    fn event(&mut self) -> Option<(EventType, Instant)> {
         let mut skip = false;
         // Skip all unknown events and return Option on first know event or when there is no more
         // events to read. Returning None on unknown event breaks iterators.
@@ -832,9 +832,10 @@ impl Gamepad {
             };
 
             if let Some(ev) = ev {
-                let dur = Duration::new(event.time.tv_sec as u64, event.time.tv_usec as u32 * 1000);
-
-                return Some((ev, UNIX_EPOCH + dur));
+                // let dur = Duration::new(event.time.tv_sec as u64, event.time.tv_usec as u32 * 1000);
+                //
+                // return Some((ev, UNIX_EPOCH + dur));
+                return Some((ev, Instant::now()));
             }
         }
     }

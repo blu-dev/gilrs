@@ -12,10 +12,10 @@ pub mod state;
 
 use std::{
     fmt::{Display, Formatter, Result as FmtResult},
-    time::SystemTime,
+    time::Instant,
 };
 
-use crate::{constants::*, gamepad::GamepadId, utils};
+use crate::{constants::*, gamepad::GamepadId};
 
 #[cfg(feature = "serde-serialize")]
 use serde::{Deserialize, Serialize};
@@ -54,7 +54,7 @@ pub struct Event {
     /// Event's data.
     pub event: EventType,
     /// Time when event was emitted.
-    pub time: SystemTime,
+    pub time: Instant,
 }
 
 impl Event {
@@ -63,7 +63,7 @@ impl Event {
         Event {
             id,
             event,
-            time: utils::time_now(),
+            time: Instant::now(),
         }
     }
 
