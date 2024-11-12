@@ -435,7 +435,9 @@ struct DeviceInfo {
     entry_id: u64,
     location_id: u32,
     is_connected: bool,
+    last_hat_axis: [i32; 2],
 }
+
 #[cfg(feature = "serde-serialize")]
 use serde::{Deserialize, Serialize};
 
@@ -663,6 +665,7 @@ extern "C" fn device_matching_cb(
                 entry_id: entry_id,
                 location_id: location_id,
                 is_connected: true,
+                last_hat_axis: [0; 2],
             });
 
             device_infos.len() - 1
@@ -748,7 +751,7 @@ extern "C" fn input_value_cb(
         }
     };
 
-    let device_infos = device_infos.lock().unwrap();
+    let mut device_infos = device_infos.lock().unwrap();
     let id = match device_infos
         .iter()
         .position(|info| info.entry_id == entry_id && info.is_connected)
@@ -853,6 +856,42 @@ extern "C" fn input_value_cb(
             0 | 1 | 7 => -1, // up
             _ => 0,
         };
+
+        if x_axis_value != 0 && device_infos[id].last_hat_axis[0] == -x_axis_value {
+            println!("Falsifying x axis event");
+            let _ = tx.send((
+                Event::new(
+                    id,
+                    EventType::AxisValueChanged(
+                        0,
+                        crate::EvCode(EvCode {
+                            page,
+                            usage: USAGE_AXIS_DPADX,
+                        }),
+                    ),
+                ),
+                None,
+            ));
+        }
+
+        if device_infos[id].last_hat_axis[1] == -y_axis_value {
+            println!("Falsifying y axis event");
+            let _ = tx.send((
+                Event::new(
+                    id,
+                    EventType::AxisValueChanged(
+                        0,
+                        crate::EvCode(EvCode {
+                            page,
+                            usage: USAGE_AXIS_DPADY,
+                        }),
+                    ),
+                ),
+                None,
+            ));
+        }
+
+        device_infos[id].last_hat_axis = [x_axis_value, y_axis_value];
 
         let x_axis_event = Event::new(
             id,
